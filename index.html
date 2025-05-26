@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Atomic Architect</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', cursive;
+            overflow: hidden;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .game-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-title {
+            font-size: 28px;
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        .stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .stat-item {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .lives {
+            color: #FF6B6B;
+        }
+
+        .score {
+            color: #4ECDC4;
+        }
+
+        .level {
+            color: #FFE66D;
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            position: relative;
+        }
+
+        .atom-area {
+            flex: 2;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+
+        .atom-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+        }
+
+        .nucleus {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 40px;
+            height: 40px;
+            background: radial-gradient(circle, #FF6B6B, #FF4757);
+            border-radius: 50%;
+            border: 3px solid #FFF;
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.6);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .orbital {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .orbital:hover {
+            border-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        .orbital.s-orbital { width: 80px; height: 80px; }
+        .orbital.p-orbital { width: 140px; height: 140px; }
+        .orbital.d-orbital { width: 200px; height: 200px; }
+
+        .electron {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: radial-gradient(circle, #4ECDC4, #45B7B8);
+            border-radius: 50%;
+            border: 2px solid #FFF;
+            animation: orbit 3s linear infinite;
+            box-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+        }
+
+        @keyframes orbit {
+            from { transform: rotate(0deg) translateX(40px) rotate(0deg); }
+            to { transform: rotate(360deg) translateX(40px) rotate(-360deg); }
+        }
+
+        .character-area {
+            flex: 1;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: rgba(0,0,0,0.2);
+            backdrop-filter: blur(5px);
+        }
+
+        .character {
+            width: 150px;
+            height: 150px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .atom-character {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, #FFE66D, #FF9F43);
+            border-radius: 50%;
+            border: 4px solid #FFF;
+            position: relative;
+            animation: bounce 2s infinite;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .character-face {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .eyes {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+        }
+
+        .eye {
+            width: 20px;
+            height: 20px;
+            background: #FFF;
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .pupil {
+            width: 8px;
+            height: 8px;
+            background: #333;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .mouth {
+            width: 30px;
+            height: 15px;
+            border: 3px solid #333;
+            border-top: none;
+            border-radius: 0 0 30px 30px;
+        }
+
+        .speech-bubble {
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 15px;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            min-height: 60px;
+            max-width: 250px;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid rgba(255,255,255,0.95);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+        }
+
+        .element-info {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 15px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .element-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FFD700;
+            margin-bottom: 5px;
+        }
+
+        .element-number {
+            font-size: 16px;
+            opacity: 0.8;
+        }
+
+        .electron-counter {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #4ECDC4, #45B7B8);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(78, 205, 196, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #FF6B6B, #FF4757);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 107, 107, 0.4);
+        }
+
+        .game-over {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .game-over-content {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            border: 3px solid #FFD700;
+        }
+
+        .feedback {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255,255,255,0.95);
+            color: #333;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 18px;
+            font-weight: bold;
+            display: none;
+            z-index: 100;
+            animation: feedbackPop 0.5s ease;
+        }
+
+        @keyframes feedbackPop {
+            0% { transform: translate(-50%, -50%) scale(0); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: #FFD700;
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="particles" id="particles"></div>
+        
+        <div class="header">
+            <div class="game-title">⚛️ Atomic Architect</div>
+            <div class="stats">
+                <div class="stat-item lives">❤️ Nyawa: <span id="lives">3</span></div>
+                <div class="stat-item score">⭐ Skor: <span id="score">0</span></div>
+                <div class="stat-item level">🔬 Level: <span id="level">1</span></div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="atom-area">
+                <div class="atom-container" id="atomContainer">
+                    <div class="nucleus"></div>
+                </div>
+                <div class="feedback" id="feedback"></div>
+            </div>
+
+            <div class="character-area">
+                <div class="character">
+                    <div class="atom-character">
+                        <div class="character-face">
+                            <div class="eyes">
+                                <div class="eye"><div class="pupil"></div></div>
+                                <div class="eye"><div class="pupil"></div></div>
+                            </div>
+                            <div class="mouth"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="speech-bubble" id="speechBubble">
+                    Halo! Aku adalah Atom-chan! Mari kita bangun atom bersama-sama! 🌟
+                </div>
+
+                <div class="element-info">
+                    <div class="element-name" id="elementName">Hidrogen</div>
+                    <div class="element-number" id="elementInfo">Nomor Atom: 1</div>
+                </div>
+
+                <div class="electron-counter">
+                    <div>Elektron yang perlu ditempatkan: <span id="electronsNeeded">1</span></div>
+                    <div>Elektron tersisa: <span id="electronsRemaining">1</span></div>
+                </div>
+
+                <div class="controls">
+                    <button class="btn btn-primary" id="checkAnswer">Periksa Jawaban</button>
+                    <button class="btn btn-secondary" id="resetAtom">Reset Atom</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="game-over" id="gameOver">
+            <div class="game-over-content">
+                <h2 id="gameOverTitle">Game Over!</h2>
+                <p id="gameOverMessage">Nyawa habis! Tapi jangan menyerah!</p>
+                <button class="btn btn-primary" id="restartGame">Main Lagi</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class AtomicArchitect {
+            constructor() {
+                this.lives = 3;
+                this.score = 0;
+                this.level = 1;
+                this.currentElement = null;
+                this.placedElectrons = [];
+                this.backgroundMusic = null;
+                
+                this.elements = [
+                    { name: 'Hidrogen', symbol: 'H', atomicNumber: 1, electrons: 1 },
+                    { name: 'Helium', symbol: 'He', atomicNumber: 2, electrons: 2 },
+                    { name: 'Lithium', symbol: 'Li', atomicNumber: 3, electrons: 3 },
+                    { name: 'Beryllium', symbol: 'Be', atomicNumber: 4, electrons: 4 },
+                    { name: 'Boron', symbol: 'B', atomicNumber: 5, electrons: 5 },
+                    { name: 'Karbon', symbol: 'C', atomicNumber: 6, electrons: 6 },
+                    { name: 'Nitrogen', symbol: 'N', atomicNumber: 7, electrons: 7 },
+                    { name: 'Oksigen', symbol: 'O', atomicNumber: 8, electrons: 8 }
+                ];
+
+                this.speeches = [
+                    "Wah, hebat! Kamu berhasil! 🌟",
+                    "Ayo semangat! Kita bisa melakukannya! 💪",
+                    "Hmm, coba periksa lagi ya! 🤔",
+                    "Level selanjutnya akan lebih menantang! 🚀",
+                    "Ingat, elektron mengisi orbital dari yang terdekat! 📚",
+                    "Kamu semakin pintar! 🧠✨",
+                    "Jangan menyerah! Setiap kesalahan adalah pembelajaran! 💝"
+                ];
+
+                this.init();
+            }
+
+            init() {
+                this.createBackgroundMusic();
+                this.createParticles();
+                this.setupEventListeners();
+                this.startLevel();
+                this.updateDisplay();
+            }
+
+            createBackgroundMusic() {
+                // Membuat audio context untuk background music
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    this.playBackgroundTone(audioContext);
+                } catch (e) {
+                    console.log('Audio context not supported');
+                }
+            }
+
+            playBackgroundTone(audioContext) {
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+                
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+                
+                oscillator.frequency.setValueAtTime(220, audioContext.currentTime);
+                oscillator.type = 'sine';
+                gainNode.gain.setValueAtTime(0.05, audioContext.currentTime);
+                
+                oscillator.start();
+                
+                // Variasi nada untuk membuat melodi sederhana
+                setInterval(() => {
+                    const frequencies = [220, 261.63, 293.66, 329.63, 369.99];
+                    const randomFreq = frequencies[Math.floor(Math.random() * frequencies.length)];
+                    oscillator.frequency.setValueAtTime(randomFreq, audioContext.currentTime);
+                }, 3000);
+            }
+
+            createParticles() {
+                const particlesContainer = document.getElementById('particles');
+                
+                setInterval(() => {
+                    const particle = document.createElement('div');
+                    particle.className = 'particle';
+                    particle.style.left = Math.random() * 100 + '%';
+                    particle.style.animationDelay = Math.random() * 6 + 's';
+                    particlesContainer.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 6000);
+                }, 1000);
+            }
+
+            setupEventListeners() {
+                document.getElementById('checkAnswer').addEventListener('click', () => this.checkAnswer());
+                document.getElementById('resetAtom').addEventListener('click', () => this.resetAtom());
+                document.getElementById('restartGame').addEventListener('click', () => this.restartGame());
+                
+                // Auto-play audio on first user interaction
+                document.addEventListener('click', () => {
+                    this.createBackgroundMusic();
+                }, { once: true });
+            }
+
+            startLevel() {
+                this.currentElement = this.elements[this.level - 1];
+                this.placedElectrons = [];
+                this.createAtomStructure();
+                this.updateElementInfo();
+                this.updateSpeech("Level " + this.level + "! Mari kita bangun atom " + this.currentElement.name + "! 🔬");
+            }
+
+            createAtomStructure() {
+                const container = document.getElementById('atomContainer');
+                const nucleus = container.querySelector('.nucleus');
+                
+                // Hapus orbital dan elektron yang ada
+                const existingOrbitals = container.querySelectorAll('.orbital');
+                const existingElectrons = container.querySelectorAll('.electron');
+                existingOrbitals.forEach(el => el.remove());
+                existingElectrons.forEach(el => el.remove());
+
+                // Tentukan orbital yang diperlukan berdasarkan jumlah elektron
+                const electrons = this.currentElement.electrons;
+                const orbitals = [];
+
+                if (electrons >= 1) orbitals.push({ type: 's', level: 1, capacity: 2, electrons: 0 });
+                if (electrons >= 3) orbitals.push({ type: 's', level: 2, capacity: 2, electrons: 0 });
+                if (electrons >= 5) orbitals.push({ type: 'p', level: 2, capacity: 6, electrons: 0 });
+
+                // Buat orbital
+                orbitals.forEach((orbital, index) => {
+                    const orbitalElement = document.createElement('div');
+                    orbitalElement.className = `orbital ${orbital.type}-orbital`;
+                    orbitalElement.dataset.type = orbital.type;
+                    orbitalElement.dataset.level = orbital.level;
+                    orbitalElement.dataset.capacity = orbital.capacity;
+                    orbitalElement.dataset.electrons = 0;
+                    
+                    // Ukuran orbital berdasarkan level dan tipe
+                    if (orbital.type === 's' && orbital.level === 1) {
+                        orbitalElement.style.width = '80px';
+                        orbitalElement.style.height = '80px';
+                    } else if (orbital.type === 's' && orbital.level === 2) {
+                        orbitalElement.style.width = '140px';
+                        orbitalElement.style.height = '140px';
+                    } else if (orbital.type === 'p') {
+                        orbitalElement.style.width = '200px';
+                        orbitalElement.style.height = '200px';
+                    }
+
+                    orbitalElement.addEventListener('click', (e) => this.placeElectron(e, orbital));
+                    container.appendChild(orbitalElement);
+                });
+
+                this.orbitals = orbitals;
+            }
+
+            placeElectron(event, orbital) {
+                const orbitalElement = event.target;
+                const currentElectrons = parseInt(orbitalElement.dataset.electrons);
+                const capacity = parseInt(orbitalElement.dataset.capacity);
+
+                if (currentElectrons < capacity && this.placedElectrons.length < this.currentElement.electrons) {
+                    // Tambah elektron
+                    const electron = document.createElement('div');
+                    electron.className = 'electron';
+                    
+                    // Posisi elektron dalam orbital
+                    const angle = (currentElectrons * 180) / capacity;
+                    const radius = parseFloat(orbitalElement.style.width) / 2 - 10;
+                    
+                    electron.style.left = '50%';
+                    electron.style.top = '50%';
+                    electron.style.transformOrigin = `0 0`;
+                    electron.style.animation = `orbit 3s linear infinite`;
+                    electron.style.animationDelay = `${currentElectrons * 0.5}s`;
+
+                    orbitalElement.appendChild(electron);
+                    orbitalElement.dataset.electrons = currentElectrons + 1;
+                    
+                    this.placedElectrons.push({
+                        orbital: orbital,
+                        element: electron
+                    });
+
+                    this.updateElectronsRemaining();
+                    this.playSound('place');
+                }
+            }
+
+            checkAnswer() {
+                const correct = this.validateElectronConfiguration();
+                
+                if (correct) {
+                    this.score += (this.level * 10);
+                    this.showFeedback('Benar! 🌟 +' + (this.level * 10) + ' poin', 'success');
+                    this.updateSpeech(this.speeches[0]);
+                    
+                    setTimeout(() => {
+                        if (this.level < this.elements.length) {
+                            this.level++;
+                            this.startLevel();
+                        } else {
+                            this.showGameOver('Selamat!', 'Kamu telah menyelesaikan semua level! 🎉');
+                        }
+                    }, 2000);
+                } else {
+                    this.lives--;
+                    this.showFeedback('Salah! ❌ Nyawa -1', 'error');
+                    this.updateSpeech(this.speeches[2]);
+                    
+                    if (this.lives <= 0) {
+                        setTimeout(() => {
+                            this.showGameOver('Game Over!', 'Nyawa habis! Tapi jangan menyerah! 💪');
+                        }, 1000);
+                    }
+                }
+                
+                this.updateDisplay();
+                this.playSound(correct ? 'success' : 'error');
+            }
+
+            validateElectronConfiguration() {
+                if (this.placedElectrons.length !== this.currentElement.electrons) {
+                    return false;
+                }
+
+                // Aturan pengisian elektron: 1s, 2s, 2p
+                const expectedConfig = this.getExpectedConfiguration(this.currentElement.electrons);
+                const actualConfig = this.getActualConfiguration();
+
+                return JSON.stringify(expectedConfig) === JSON.stringify(actualConfig);
+            }
+
+            getExpectedConfiguration(totalElectrons) {
+                const config = {};
+                let remaining = totalElectrons;
+
+                // 1s (max 2)
+                if (remaining > 0) {
+                    const electrons = Math.min(2, remaining);
+                    config['1s'] = electrons;
+                    remaining -= electrons;
+                }
+
+                // 2s (max 2)
+                if (remaining > 0) {
+                    const electrons = Math.min(2, remaining);
+                    config['2s'] = electrons;
+                    remaining -= electrons;
+                }
+
+                // 2p (max 6)
+                if (remaining > 0) {
+                    const electrons = Math.min(6, remaining);
+                    config['2p'] = electrons;
+                    remaining -= electrons;
+                }
+
+                return config;
+            }
+
+            getActualConfiguration() {
+                const config = {};
+                
+                this.orbitals.forEach(orbital => {
+                    const key = orbital.level + orbital.type;
+                    const orbitalElement = document.querySelector(`[data-type="${orbital.type}"][data-level="${orbital.level}"]`);
+                    const electrons = parseInt(orbitalElement.dataset.electrons);
+                    if (electrons > 0) {
+                        config[key] = electrons;
+                    }
+                });
+
+                return config;
+            }
+
+            resetAtom() {
+                this.placedElectrons = [];
+                this.createAtomStructure();
+                this.updateElectronsRemaining();
+                this.updateSpeech("Ayo coba lagi! Kamu pasti bisa! 💪");
+                this.playSound('reset');
+            }
+
+            updateDisplay() {
+                document.getElementById('lives').textContent = this.lives;
+                document.getElementById('score').textContent = this.score;
+                document.getElementById('level').textContent = this.level;
+            }
+
+            updateElementInfo() {
+                document.getElementById('elementName').textContent = this.currentElement.name;
+                document.getElementById('elementInfo').textContent = `Nomor Atom: ${this.currentElement.atomicNumber}`;
+                document.getElementById('electronsNeeded').textContent = this.currentElement.electrons;
+                this.updateElectronsRemaining();
+            }
+
+            updateElectronsRemaining() {
+                const remaining = this.currentElement.electrons - this.placedElectrons.length;
+                document.getElementById('electronsRemaining').textContent = remaining;
+            }
+
+            updateSpeech(text) {
+                const bubble = document.getElementById('speechBubble');
+                bubble.textContent = text;
+                
+                // Animasi karakter
+                const character = document.querySelector('.atom-character');
+                character.style.animation = 'bounce 0.5s ease';
+                setTimeout(() => {
+                    character.style.animation = 'bounce 2s infinite';
+                }, 500);
+            }
+
+            showFeedback(message, type) {
+                const feedback = document.getElementById('feedback');
+                feedback.textContent = message;
+                feedback.style.display = 'block';
+                feedback.style.background = type === 'success' ? 
+                    'rgba(78, 205, 196, 0.95)' : 'rgba(255, 107, 107, 0.95)';
+                
+                setTimeout(() => {
+                    feedback.style.display = 'none';
+                }, 2000);
+            }
+
+            showGameOver(title, message) {
+                document.getElementById('gameOverTitle').textContent = title;
+                document.getElementById('gameOverMessage').textContent = message;
+                document.getElementById('gameOver').style.display = 'flex';
+            }
+
+            restartGame() {
+                this.lives = 3;
+                this.score = 0;
+                this.level = 1;
+                this.placedElectrons = [];
+                document.getElementById('gameOver').style.display = 'none';
+                this.startLevel();
+                this.updateDisplay();
+                this.updateSpeech("Mari kita mulai lagi! Semangat! 🌟");
+            }
+
+            playSound(type) {
+                // Simple sound effects using Web Audio API
+                try {
+                    const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    const oscillator = audioContext.createOscillator();
+                    const gainNode = audioContext.createGain();
+                    
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+                    
+                    let frequency, duration;
+                    switch(type) {
+                        case 'success':
+                            frequency = 523.25; // C5
+                            duration = 0.3;
+                            break;
+                        case 'error':
+                            frequency = 207.65; // G#3
+                            duration = 0.5;
+                            break;
+                        case 'place':
+                            frequency = 349.23; // F4
+                            duration = 0.1;
+                            break;
+                        case 'reset':
+                            frequency = 293.66; // D4
+                            duration = 0.2;
+                            break;
+                        default:
+                            frequency = 440;
+                            duration = 0.1;
+                    }
+                    
+                    oscillator.frequency.setValueAtTime(frequency, audioContext.currentTime);
+                    oscillator.type = 'sine';
+                    gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+                    
+                    oscillator.start(audioContext.currentTime);
+                    oscillator.stop(audioContext.currentTime + duration);
+                } catch (e) {
+                    console.log('Sound effects not supported');
+                }
+            }
+        }
+
+        // Start the game when page loads
+        window.addEventListener('load', () => {
+            new AtomicArchitect();
+        });
+    </script>
+</body>
+</html>
